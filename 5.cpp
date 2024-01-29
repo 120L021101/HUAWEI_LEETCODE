@@ -34,6 +34,7 @@ public:
 };
 
 
+
 int main(void) {
     Solution s;
     cout << s.longestPalindrome("ABABCCC");
