@@ -15,3 +15,4 @@ class Solution:
                 current_length -= 1
             right += 1
         return min_length if min_length is not None else 0 
+    
