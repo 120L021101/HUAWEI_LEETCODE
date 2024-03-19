@@ -21,13 +21,10 @@ public:
             }
         }
         int node1 = 0, node2 = 1;
-        vector<int> alive (n, 1);
         while (int size = zero_node.size()) {
             for (int i = 0; i < size; ++i) {
                 int node = zero_node[0];
-                alive[node] = 0;
                 for (int con_node : edge_map[node]) {
-                    if (!alive[con_node]) continue;
                     if (1 == --degree[con_node]) {
                         zero_node.push_back(con_node);
                     }
