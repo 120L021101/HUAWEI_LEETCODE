@@ -12,6 +12,7 @@ typedef struct _LinkedXY {
 
 typedef LinkedXY * pLinkedXY;
 
+
 int bfs(char * matrix, int n, int m) {
     unsigned char visited[n][m];
     memset(visited, 0, sizeof(unsigned char) * n * m);
