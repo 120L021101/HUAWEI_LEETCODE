@@ -18,7 +18,6 @@ int main(void) {
     while (1) {
         r ++;
         if (r == n) break;
-        cWin = pos[r] - pos[l];
         while ((cWin = pos[r] - pos[l]) > k) l ++;
         maxCh = fmax(maxCh, r - l + 1);
     }
