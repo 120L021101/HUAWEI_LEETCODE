@@ -60,13 +60,3 @@ impl Solution {
 
 
 
-
-
-
-
-struct Solution;
-
-
-pub fn main() {
-
-}
