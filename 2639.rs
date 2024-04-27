@@ -1,6 +1,3 @@
-use std::{collections::HashMap, hash::Hash};
-
-
 impl Solution {
 
     pub fn find_column_width(grid: Vec<Vec<i32>>) -> Vec<i32> {
@@ -20,15 +17,4 @@ impl Solution {
         }
         ans
     }
-}
-
-
-
-
-
-struct Solution;
-
-
-pub fn main() {
-
 }
