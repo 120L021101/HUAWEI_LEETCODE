@@ -2,97 +2,20 @@ use std::collections::binary_heap;
 use std::{collections::HashMap, hash::Hash, collections::BinaryHeap};
 use std::cmp::{Ord, Ordering};
 
-#[derive(PartialEq, Eq, Clone, Copy, Debug)]
-struct Item {
-    cost: i32,
-    idx: usize,
-}
-
-impl Ord for Item {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.cost.cmp(&other.cost).reverse()
-    }
-}
-impl PartialOrd for Item {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-
 impl Solution {
-    pub fn total_cost(costs: Vec<i32>, k: i32, candidates: i32) -> i64 {
-        let mut t_cost: i64 = 0;
-
-        let mut l_idx: usize = 0;
-        let mut r_idx: usize = costs.len() - 1;
-        let mut cnt: i32 = 0;
-        
-        let mut heap: BinaryHeap<Item> = BinaryHeap::new();
-
-        loop {
-            if cnt == candidates {
-                break;
+    pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
+        let mut idxMap: HashMap<i32, usize> = HashMap::new();
+        for idx in 0..nums.len() {
+            let find_val: i32 = target - nums[idx];
+            if idxMap.contains_key(&find_val) {
+                return vec![*idxMap.get(&find_val).unwrap() as i32, idx as i32];
             }
-            if l_idx == r_idx {
-                heap.push(Item{
-                    cost: costs[l_idx],
-                    idx: l_idx,
-                });
-                l_idx += 1;
-            }
-            if l_idx > r_idx {
-                break;
-            }
-            heap.push(Item{
-                cost: costs[l_idx],
-                idx: l_idx,
-            });
-            heap.push(Item{
-                cost: costs[r_idx],
-                idx: r_idx
-            });
+            idxMap.insert(nums[idx], idx);
 
-            l_idx += 1;
-            r_idx -= 1;
-
-            cnt += 1;
         }
-
-        cnt = 0;
-        loop {
-            if cnt == k {
-                break;
-            }
-            cnt += 1;
-
-            let top_item = heap.pop().unwrap();
-            t_cost += top_item.cost as i64;
-
-            if l_idx > r_idx {
-                continue;
-            }
-            if top_item.idx < l_idx {
-                heap.push(Item{
-                    cost: costs[l_idx],
-                    idx: l_idx
-                });
-                l_idx += 1;
-            }
-            else {
-                heap.push(Item{
-                    cost: costs[r_idx],
-                    idx: r_idx
-                });
-                r_idx -= 1;
-            }
-        }
-
-        t_cost
+        unreachable!();
     }
 }
-
-
 struct Solution;
 
 
