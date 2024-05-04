@@ -6,92 +6,78 @@ use std::{default, string, vec};
 use std::{collections::HashMap, hash::Hash, collections::BinaryHeap};
 use std::cmp::{Ord, Ordering};
 
-#[derive(PartialEq, Eq)]
-enum Status {
-    JustStop,
-    Failed,
-    Reached,
-}
-#[derive(PartialEq, Eq, Clone, Copy, Hash)]
-enum Direction {
-    Down,
-    Left,
-    Right,
-    Up,
-    Undecided,
-}
-// dlru
-
 impl Solution {
 
-    fn dfs(visited:&mut HashMap<Vec<i32>, HashSet<Direction>>, maze:& Vec<Vec<i32>>, pos:& Vec<i32>, hole:& Vec<i32>, direction:& Direction, curPath: &mut Vec<Vec<i32>>) -> Status {
-        if !visited.contains_key(pos) {
-            visited.insert(pos.clone(), HashSet::new());
-        }
-        let (x, y) = (pos[0], pos[1]);
-        if x == -1 || y == -1 || x == maze.len() as i32 || y == maze[0usize].len() as i32 {
-            return Status::JustStop
-        }
-        if maze[x as usize][y as usize] == 1 {
-            return Status::JustStop
-        }
-        if visited.get(pos).as_ref().unwrap().contains(direction) {
-            return Status::Failed
-        }
-        visited.get_mut(pos).as_mut().unwrap().insert(direction.clone());
-        let mut nextX = x;
-        let mut nextY = y;
-        match direction {
-            Direction::Left  => { nextX = nextX;     nextY = nextY - 1; },
-            Direction::Right => { nextX = nextX;     nextY = nextY + 1; },
-            Direction::Up    => { nextX = nextX - 1; nextY = nextY;     },
-            Direction::Down  => { nextX = nextX + 1; nextY = nextY;     },
-            Direction::Undecided => { nextX = -1; nextY = -1; },
-        }
-        let tryResult = Solution::dfs(visited, maze, &vec![nextX, nextY], hole, &direction, curPath);
-        match tryResult {
-            Status::Reached | Status::Failed => { return tryResult },
-            Status::JustStop => {},
-        }
-        if x == hole[0] && y == hole[1] {
-            return Status::Reached
-        }
-        let mut nextTry: Vec<Vec<i32>>;
-        let mut nextDirection: Vec<Direction>;
-        match direction {
-            Direction::Down | Direction::Up =>    {
-                nextTry = vec![vec![x, y - 1], vec![x, y + 1]];
-                nextDirection = vec![Direction::Left, Direction::Right];
-            },
-            Direction::Left | Direction::Right => {
-                nextTry = vec![vec![x - 1, y], vec![x + 1, y]];
-                nextDirection = vec![Direction::Up, Direction::Down];
-            },
-            Direction::Undecided => { 
-                nextTry = vec![vec![x, y - 1], vec![x, y + 1], vec![x - 1, y], vec![x + 1, y]];
-                nextDirection = vec![Direction::Left, Direction::Right, Direction::Up, Direction::Down];
-            },
-        }
-        for i in 0..nextTry.len() {
-            let (n_try, n_direction) = (nextTry[i].clone(), nextDirection[i].clone());
-            let tryResult = Solution::dfs(visited, maze, &n_try, hole, &n_direction, curPath);
-            match tryResult {
-                Status::Reached => { return Status::Reached },
-                Status::JustStop => {
-                    if x == hole[0] && y == hole[1] {
-                        return Status::Reached
-                }},
-                Status::Failed => {},
+    fn binarySearch(job:& Vec<Vec<i32>>, e: i32, searchTime: i32) -> i32 {
+
+        let mut start = 0i32;
+        let mut end = e;
+
+        while start < end {
+
+            let middle = (start + end) / 2;
+            if job[middle as usize][1] == searchTime {
+                break;
+            }
+            
+            if job[middle as usize][1] < searchTime {
+                start = middle + 1;
+            }
+            else {
+                end = middle - 1;
             }
         }
 
-        Status::Failed
+        let mut ret_idx = start;
+        if job[ret_idx as usize][1] == searchTime {
+            while ret_idx < e && job[ret_idx as usize][1] == searchTime {
+                ret_idx += 1;
+            }
+            return ret_idx - 1
+        }
+        if (job[ret_idx as usize][1] > searchTime) {
+            while ret_idx >= 0 && job[ret_idx as usize][1] > searchTime {
+                ret_idx -= 1;
+            }
+            return ret_idx
+        }
+        while ret_idx < e && job[ret_idx as usize][1] <= searchTime {
+            ret_idx += 1;
+        }
+        
+        if ret_idx == e || job[ret_idx as usize][1] > searchTime {
+            ret_idx -= 1;
+        }
+        ret_idx
     }
 
-    pub fn has_path(maze: Vec<Vec<i32>>, start: Vec<i32>, destination: Vec<i32>) -> bool {
-        Status::Reached == Solution::dfs(&mut HashMap::new(), &maze, &start, &destination, &Direction::Undecided, &mut vec![])
+    pub fn job_scheduling(start_time: Vec<i32>, end_time: Vec<i32>, profit: Vec<i32>) -> i32 {
+        let mut job: Vec<Vec<i32>> = vec![];
+        let mut dp: Vec<i32> = vec![0; start_time.len()];
+        
+        for i in 0..start_time.len() {
+            job.push(vec![start_time[i], end_time[i], profit[i]]);
+        }
+        job.sort_by(|a, b| a[1].partial_cmp(&b[1]).unwrap());
+        dp[0] = job[0][2];
+
+        for i in 1..job.len() {
+            let (start, end, pro) = (job[i][0], job[i][1], job[i][2]);
+            dp[i] = dp[i - 1]; // 不选这个工作
+            let lastDoableJobIdx = Solution::binarySearch(&job, i as i32, start);
+            let mut lastProfit = pro;
+            if lastDoableJobIdx != -1 {
+                lastProfit = dp[lastDoableJobIdx as usize] + pro;
+            }
+            if lastProfit > dp[i] {
+                dp[i] = lastProfit;
+            }
+        }
+
+        dp[dp.len() - 1]
     }
 }
+
 struct Solution;
 
 
