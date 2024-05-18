@@ -25,10 +25,3 @@ impl Solution {
         divisors[max_idx]
     }
 }
-
-struct Solution;
-
-
-pub fn main() {
-
-}
